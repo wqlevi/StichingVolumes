@@ -16,9 +16,9 @@ int * make_sample(int size_x, int size_y, _Bool zeros){
 	 */
 	int *mat;
 	mat = malloc(sizeof(int)*size_x*size_y);
-	for (int i = 0; i<size_x; i++)
+	for (int j = 0; j<size_y; j++)
 	{
-		for (int j = 0; j<size_y; j++)
+		for (int i = 0; i<size_x; i++)
 		{
 			if(zeros)
 			{
@@ -26,7 +26,7 @@ int * make_sample(int size_x, int size_y, _Bool zeros){
 			}
 			else
 			{
-				mat[i*size_x+j] = i*size_x+j; // for crop initialization
+				mat[j*size_x+i] = i*size_x+j; // for crop initialization
 			}
 		}
 	}	
