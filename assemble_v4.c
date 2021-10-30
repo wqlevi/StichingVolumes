@@ -1,6 +1,7 @@
 #include <stdio.h>
 #define M 128
 #define S 512
+#define X 16*2
 /*
  * This is a 1D demo
  */
@@ -21,12 +22,12 @@ int main()
 	tmp[i] = 0;
 	}
 	/* appending along 1D */
-	for (int i = M; i<S; i+=16*2) // 64,64+16,64+2*16
+	for (int i = M; i<S; i+=X) // 128,128+32,128+2*32
 	{
 //		printf("%d\n",i);
-		for (int j=16*2; j<M;j++) 
+		for (int j=0; j<X;j++) 
 		{
-		tmp[i+j-16*2] = arr[j];
+			tmp[i+j] = arr[M-X+j];
 		}
 	}	
 	/* inspect values */
