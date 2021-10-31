@@ -1,4 +1,4 @@
-uiopen('example.csv',1);
-arr = table2array(example);
-arr = reshape(arr,512,698);
+tb=readtable('example.csv');
+arr = table2array(tb);
 imshow(arr,[]),impixelinfo();
+

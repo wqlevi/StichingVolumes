@@ -4,13 +4,11 @@
 #define M 128
 
 #define X 512
-#define Y 698
+#define Y 512
 #define I 16*2 // step size x(z)
-#define J 15*2 // step size y
+#define J 16*2 // step size y
 #define RES_X 128-I
 #define RES_Y 128-J
-
-typedef enum {false, true} bool;
 
 int * make_sample(int size_x, int size_y, _Bool zeros){
 	/*
@@ -40,16 +38,16 @@ int * make_sample(int size_x, int size_y, _Bool zeros){
 int main()
 {
 	int write_to_file(int count, int col, int *data, char const *fileName); 
-	int * assemble_2d(int * image, int * crop , bool asym);
+	int * assemble_2d(int * image, int * crop );
 
 	int *crop,*image;
-	bool asym;
 	crop = make_sample(M,M,0);// crop
 	image = make_sample(X,Y,1); // image
 	//*************BEGIN
 	int Bound_X=0,Bound_Y=0;
-	if(I!=J) asym=true;
-	image = assemble_2d(image,crop,asym);
+	if(crop == NULL || image == NULL) exit(1);
+	for(int j=0; j<Y; j+=J) // if only both step sizes are identical, it's easier...
+	image = assemble_2d(image,crop);
 	write_to_file(X*Y,X,image,"example.csv");
 	write_to_file( M*M,M,crop,"example_crop.csv");
 	
@@ -73,21 +71,11 @@ int write_to_file(int count, int col, int *data, char const *fileName)
 } 
 
 /* Assemblying function 2D*/
-int * assemble_2d(int * image, int * crop, bool asym )
+int * assemble_2d(int * image, int * crop )
 {  
 	int Bound_X=0,Bound_Y=0;
-	
 	if(crop == NULL || image == NULL) exit(1);
-	for(int j=0; j<Y; j+=J) 
-	// if only both step sizes are identical, it's easier...
-	{
-		// a patch that works for temporal asymetric matrix, by jumping loop idx
-		if(asym&&(j!=0))
-		{
-			j=M;
-			asym=false;
-		}
-		for (int i=0; i<X; i+=I)
+	for (int i=0; i<X; i+=I)
 		{
 			if((i<128)&&(j<128)) continue; // 128*128 initial
 			else if((i<128)^(j<128))	   // either one of axis < 128 
@@ -102,13 +90,17 @@ int * assemble_2d(int * image, int * crop, bool asym )
 				for(int p=0;p<I+Bound_X;p++) // x_step
 				{
 					
-					image[(q+j)*X+i+p] = crop[M*((RES_Y-Bound_Y)+q)+(RES_X-Bound_X)+p];				
+					image[(q+j)*X+i+p] = crop[M*((RES_Y-Bound_Y)+q)+(RES_X-Bound_X)+p+1];
+					
+					
+					
+				
 				}
 			}
 			
 			
 		}
-	}
+	}	
 	return image;
 }         
 
