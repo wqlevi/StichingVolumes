@@ -1,3 +1,9 @@
+/*
+ *  Mainly updated version of 2D stitching
+ *  Author : Qi Wang
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 

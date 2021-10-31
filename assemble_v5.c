@@ -1,3 +1,7 @@
+/*
+ *  Symmetric version of 2D stitching
+ *  Author : Qi Wang
+ */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -27,9 +31,7 @@ int * make_sample(int size_x, int size_y, _Bool zeros){
 			else
 			{
 				// crop initialization(element = start 1)
-				//mat[j*size_x+i] = j*size_x+i+1;
-				mat[j*size_x+i] = j+i;
-
+			mat[j*size_x+i] = j*size_x+i+1;
 
 			}
 		}
