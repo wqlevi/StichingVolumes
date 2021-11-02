@@ -34,9 +34,10 @@ int main()
 	crop = make_sample(M,M,M,0);// crop
 	image = make_sample(X,Y,Z,1); // image
 	image = assemble_3d(image,crop,asym);
-	//write_to_file(X*Y*Z,X,Y,image,"example.txt");
-	//write_to_file( M*M,M,crop,"example_crop.csv");
-
+	write_to_file(X*Y*Z,X,Y,image,"example.dat");
+	write_to_file( M*M*M,M,M,crop,"example_crop.dat");
+	free(image);
+	free(crop);
 	return 0;
 }
 
@@ -87,61 +88,62 @@ int write_to_file(int count, int cols,int rows, int *data, char const *fileName)
 
 int * assemble_3d(int * image, int * crop, bool init_crop )
 {
-	int Bound_X=0,Bound_Y=0,Bound_Z=0;
+  int Bound_X=0,Bound_Y=0,Bound_Z=0;
   int * passing_value(int * image, int * crop, int Bound_X,int Bound_Y,int Bound_Z,int i ,int j,int k);
   int size_init = 128;
-  //bool init_crop = true;
-  FILE * f=fopen("prin.txt","w");
+  bool init_crop_z = true;
+  //FILE * f=fopen("prin.txt","w");
 	if (crop == NULL || image == NULL) exit(1);
 	for(int k=0; k<Z; k+=K)
 	{
+		if(init_crop_z&&(k!=0))
+		{
+			k=(M-K);
+			init_crop_z=false;
+			//printf("chanegedZ");
+			continue;
+		}
+		init_crop = true;
 		for(int j=0; j<Y; j+=J)
 		// if only both step sizes are identical, it's easier...
 		{
-      if(init_crop&&(j!=0))
-      {
-        j=(M-J);
-        init_crop=false;
-        printf("chanegd");
-      }
+			if(init_crop&&(j!=0))
+			{
+				j=(M-J);
+				init_crop=false;
+				//printf("chaneged");
+				continue;
+			}
 			for (int i=0; i<X; i+=I)
 			{
 				
-        if(((i==0)+(j==0)+(k==0)) == 3) // init crop
-        {
-          Bound_X = RES_X;
-  				Bound_Y = RES_Y;
-          Bound_Z = RES_Z;
-          fprintf(f,"all: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
-          init_crop = false;
-          i=(M-I);
-          //j=(M-J);
-          continue;
-        } // 128*128 initial
+        	if(((i==0)+(j==0)+(k==0)) == 3) // init crop
+				{
+					Bound_X = RES_X;
+					Bound_Y = RES_Y;
+					Bound_Z = RES_Z;
+				//	fprintf(f,"all: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
+					i=(M-I);
+					continue;
+				} // 128*128 initial
         
 				else if((((i<128)+(j<128)+(k<128)) < 3)&&(((i<128)+(j<128)+(k<128)) != 0))	   // either one of axis < 128
 				{
-          i<size_init ? (Bound_X = RES_X) : (Bound_X = 0); // on YZ axis
-          j<size_init ? (Bound_Y = RES_Y) : (Bound_Y = 0); // on XZ axis
-          k<size_init ? (Bound_Z = RES_Z) : (Bound_Z = 0); // on XY axis
-          fprintf(f,"either: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
- /*         if(j<size_init)
-            {
-              j=(M-J);
-            }
-  */       continue;
-          /*
-          
-          */
+					i<size_init ? (Bound_X = RES_X) : (Bound_X = 0); // on YZ axis
+					j<size_init ? (Bound_Y = RES_Y) : (Bound_Y = 0); // on XZ axis
+					k<size_init ? (Bound_Z = RES_Z) : (Bound_Z = 0); // on XY axis
+				//	fprintf(f,"either: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
+					continue;
+		
 				}
-        else if(((i<128)+(j<128)+(k<128)) == 3) continue;
+       			else if(((i<128)+(j<128)+(k<128)) == 3) continue;
 				else Bound_Y=Bound_X=Bound_Z=0;
-        fprintf(f,"none: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
-				//image = passing_value(image,crop,Bound_X,Bound_Y,Bound_Z,i,j,k);
+       			//fprintf(f,"none: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
+				image = passing_value(image,crop,Bound_X,Bound_Y,Bound_Z,i,j,k);
 			}
 		}
 	}
-  fclose(f);
+  //fclose(f);
 	return image;
 }
 
