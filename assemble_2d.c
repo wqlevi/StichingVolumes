@@ -134,24 +134,32 @@ int * assemble_2d(int * image, int * crop, bool asym )
 		}
 		for (int i=0; i<X; i+=I)
 		{
-			if((i<size_init)&&(j<size_init)) 
+			if((i<size_init)&&(j<size_init))
 			{
-				Bound_X = RES_X; // on Y axis
+				Bound_X = RES_X;
 				Bound_Y = RES_Y;
-				passing_value(image,crop,Bound_X,Bound_Y,i,j);
+        passing_value(image,crop,Bound_X,Bound_Y,i,j);
+        printf("both: %d,%d\n",i,j);
+        i=(M-I);
+        continue;
 			} // 128*128 initial
 			else if((i<size_init)^(j<size_init))	   // either one of axis < 128
 			{
-				if(i<size_init) Bound_X = RES_X; // on Y axis
-				if(j<size_init) Bound_Y = RES_Y; // on X axis
+				i<size_init ? (Bound_X = RES_X) : (Bound_X = 0); // on Y axis
+				j<size_init ? (Bound_Y = RES_Y) : (Bound_Y = 0); // on X axis
 				passing_value(image,crop,Bound_X,Bound_Y,i,j);
+        printf("either: %d,%d\tp:%d.q:%d\n",i,j,Bound_X,Bound_Y);
+        if(i<size_init)
+        {i=(M-I);
+        continue;}
+
 			}
-			else 
+			else
 			{
 				Bound_Y=Bound_X=0;
 				passing_value(image,crop,Bound_X,Bound_Y,i,j);
+        printf("neither: %d,%d\n",i,j);
 			}
-			printf("%d,%d\n",i,j);
 		}
 	}
 	return image;
