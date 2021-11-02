@@ -1,13 +1,16 @@
 #include <stdio.h>
-
+typedef enum {false ,true} bool;
 int main()
 {
 int i,j,k;
+bool flg = false;
 
 i = 0;
 j = 1;
 k = 0;
-
-i>0 ? printf("\n%d",(i<128)+(j<128)) : printf("maller\n");
+for(i;i<10;i++)
+{
+ printf("%d\n",flg);
+}
 return 0;
 }

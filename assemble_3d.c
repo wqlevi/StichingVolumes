@@ -1,7 +1,7 @@
 /*
  *  Mainly updated version of 3D stitching
  *  Author : Qi Wang
- * 	Update : Asymmetry unsolved 
+ * 	Update : Asymmetry unsolved
  */
 
 
@@ -11,10 +11,10 @@
 #define M 128
 
 #define X 512
-#define Y 640
+#define Y 698
 #define Z 640
 #define I 16*2 // step size x,z
-#define J 16*2 // step size y
+#define J 15*2 // step size y
 #define K 16*2 // step size z
 #define RES_X 128-I // overlapped length x,z
 #define RES_Y 128-J
@@ -30,11 +30,11 @@ int main()
 	int * assemble_3d(int * image, int * crop , bool asym);
 
 	int *crop,*image;
-	bool asym;
+	bool asym=true;
 	crop = make_sample(M,M,M,0);// crop
 	image = make_sample(X,Y,Z,1); // image
 	image = assemble_3d(image,crop,asym);
-	write_to_file(X*Y*Z,X,Y,image,"example.txt");
+	//write_to_file(X*Y*Z,X,Y,image,"example.txt");
 	//write_to_file( M*M,M,crop,"example_crop.csv");
 
 	return 0;
@@ -72,7 +72,7 @@ int write_to_file(int count, int cols,int rows, int *data, char const *fileName)
   int x=cols,y=rows,z=cols;
   fprintf(f,"# Array shape: (%d, %d, %d)\n",z,y,x);
 
-    for (int i=0;i<count;i++) 
+    for (int i=0;i<count;i++)
     {
         fprintf(f,"%d",data[i]); // data starts from 0-index
         if((idx%cols == 0)&&(idx%(cols*rows) != 0)) fprintf(f,"\n");
@@ -85,45 +85,78 @@ int write_to_file(int count, int cols,int rows, int *data, char const *fileName)
   return 0;
 }
 
-int * assemble_3d(int * image, int * crop, bool asym )
+int * assemble_3d(int * image, int * crop, bool init_crop )
 {
 	int Bound_X=0,Bound_Y=0,Bound_Z=0;
-
-	if(crop == NULL || image == NULL) exit(1);
-	for(int k=M; k<Z; k+=K)
+  int * passing_value(int * image, int * crop, int Bound_X,int Bound_Y,int Bound_Z,int i ,int j,int k);
+  int size_init = 128;
+  //bool init_crop = true;
+  FILE * f=fopen("prin.txt","w");
+	if (crop == NULL || image == NULL) exit(1);
+	for(int k=0; k<Z; k+=K)
 	{
 		for(int j=0; j<Y; j+=J)
 		// if only both step sizes are identical, it's easier...
 		{
-			// a patch that works for temporal asymetric matrix, by jumping loop idx
-			/*if(asym&&(j!=0))
-			{
-				j=M;
-				asym=false;
-			}*/
+      if(init_crop&&(j!=0))
+      {
+        j=(M-J);
+        init_crop=false;
+        printf("chanegd");
+      }
 			for (int i=0; i<X; i+=I)
 			{
-				if((i<128)&&(j<128)) continue; // 128*128 initial
-				else if((i<128)^(j<128))	   // either one of axis < 128
+				
+        if(((i==0)+(j==0)+(k==0)) == 3) // init crop
+        {
+          Bound_X = RES_X;
+  				Bound_Y = RES_Y;
+          Bound_Z = RES_Z;
+          fprintf(f,"all: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
+          init_crop = false;
+          i=(M-I);
+          //j=(M-J);
+          continue;
+        } // 128*128 initial
+        
+				else if((((i<128)+(j<128)+(k<128)) < 3)&&(((i<128)+(j<128)+(k<128)) != 0))	   // either one of axis < 128
 				{
-					if(i<128) Bound_X = RES_X; // on Y axis
-					if(j<128) Bound_Y =	RES_Y; // on X axis
+          i<size_init ? (Bound_X = RES_X) : (Bound_X = 0); // on YZ axis
+          j<size_init ? (Bound_Y = RES_Y) : (Bound_Y = 0); // on XZ axis
+          k<size_init ? (Bound_Z = RES_Z) : (Bound_Z = 0); // on XY axis
+          fprintf(f,"either: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
+ /*         if(j<size_init)
+            {
+              j=(M-J);
+            }
+  */       continue;
+          /*
+          
+          */
 				}
-				else Bound_Y=Bound_X=0;
-				for(int m=0;m<K+Bound_Z;m++)
-				{
-					for(int q=0;q<J+Bound_Y;q++) // y_step
-					{
-						for(int p=0;p<I+Bound_X;p++) // x_step
-						{
-							image[(m+k)*(X*Y)+(q+j)*X+i+p] = crop[M*M*(m+RES_Z)+M*((RES_Y-Bound_Y)+q)+(RES_X-Bound_X)+p];
-						}
-					}
-				}
-
-
+        else if(((i<128)+(j<128)+(k<128)) == 3) continue;
+				else Bound_Y=Bound_X=Bound_Z=0;
+        fprintf(f,"none: %d,%d,%d\tp:%d,q:%d,m:%d\n",i,j,k,Bound_X,Bound_Y,Bound_Z);
+				//image = passing_value(image,crop,Bound_X,Bound_Y,Bound_Z,i,j,k);
 			}
 		}
 	}
+  fclose(f);
+	return image;
+}
+
+
+int * passing_value(int * image, int * crop, int Bound_X,int Bound_Y,int Bound_Z,int i ,int j,int k)
+{
+  for(int m=0;m<K+Bound_Z;m++)
+  {
+    for(int q=0;q<J+Bound_Y;q++) // y_step
+    {
+      for(int p=0;p<I+Bound_X;p++) // x_step
+      {
+        image[(m+k)*(X*Y)+(q+j)*X+i+p] = crop[M*M*(m+RES_Z)+M*((RES_Y-Bound_Y)+q)+(RES_X-Bound_X)+p];
+      }
+    }
+  }
 	return image;
 }

@@ -78,44 +78,6 @@ int write_to_file(int count, int col, int *data, char const *fileName)
 }
 
 /* Assemblying function 2D*/
-int * assemble_2d_old(int * image, int * crop, bool asym )
-{
-	int Bound_X=0,Bound_Y=0;
-
-	if(crop == NULL || image == NULL) exit(1);
-	for(int j=0; j<Y; j+=J)
-	// if only both step sizes are identical, it's easier...
-	{
-		// a patch that works for temporal asymetric matrix, by jumping loop idx
-		if(asym&&(j!=0))
-		{
-			j=M;
-			asym=false;
-		}
-		for (int i=0; i<X; i+=I)
-		{
-			if((i<128)&&(j<128)) continue; // 128*128 initial
-			else if((i<128)^(j<128))	   // either one of axis < 128
-			{
-				if(i<128) Bound_X = RES_X; // on Y axis
-				if(j<128) Bound_Y = RES_Y; // on X axis
-			}
-			else Bound_Y=Bound_X=0;
-			printf("%d,%d\n",i,j);
-			for(int q=0;q<J+Bound_Y;q++) // y_step
-			{
-				for(int p=0;p<I+Bound_X;p++) // x_step
-				{
-
-					image[(q+j)*X+i+p] = crop[M*((RES_Y-Bound_Y)+q)+(RES_X-Bound_X)+p];
-				}
-			}
-
-
-		}
-	}
-	return image;
-}
 int * assemble_2d(int * image, int * crop, bool asym )
 {
 	int * passing_value(int * image, int * crop, int Bound_X,int Bound_Y,int i, int j);
@@ -132,22 +94,23 @@ int * assemble_2d(int * image, int * crop, bool asym )
 			j=M;
 			asym=false;
 		}
+		printf("%d\n",j);
 		for (int i=0; i<X; i+=I)
 		{
 			if((i<size_init)&&(j<size_init))
 			{
 				Bound_X = RES_X;
 				Bound_Y = RES_Y;
-        passing_value(image,crop,Bound_X,Bound_Y,i,j);
-        printf("both: %d,%d\n",i,j);
-        i=(M-I);
-        continue;
+				image = passing_value(image,crop,Bound_X,Bound_Y,i,j);
+				printf("both: %d,%d\n",i,j);
+				i=(M-I);
+				continue;
 			} // 128*128 initial
 			else if((i<size_init)^(j<size_init))	   // either one of axis < 128
 			{
 				i<size_init ? (Bound_X = RES_X) : (Bound_X = 0); // on Y axis
 				j<size_init ? (Bound_Y = RES_Y) : (Bound_Y = 0); // on X axis
-				passing_value(image,crop,Bound_X,Bound_Y,i,j);
+				image = passing_value(image,crop,Bound_X,Bound_Y,i,j);
         printf("either: %d,%d\tp:%d.q:%d\n",i,j,Bound_X,Bound_Y);
         if(i<size_init)
         {i=(M-I);
@@ -157,12 +120,14 @@ int * assemble_2d(int * image, int * crop, bool asym )
 			else
 			{
 				Bound_Y=Bound_X=0;
-				passing_value(image,crop,Bound_X,Bound_Y,i,j);
+				image = passing_value(image,crop,Bound_X,Bound_Y,i,j);
         printf("neither: %d,%d\n",i,j);
 			}
 		}
 	}
 	return image;
+  free(image);
+  free(crop);
 }
 
 int * passing_value(int * image, int * crop, int Bound_X,int Bound_Y,int i ,int j)
