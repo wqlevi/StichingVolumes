@@ -8,3 +8,8 @@
 ## 3D example
 - [x] ~~TBD~~
 - [x] ~~Finished~~
+
+## Compile them:
+~~~bash
+$ gcc -Wall -Iinclude -Llib test.c -lnifti1io -lm -o test
+~~~
