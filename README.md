@@ -13,3 +13,8 @@
 ~~~bash
 $ gcc -Wall -Iinclude -Llib test.c -lnifti1io -lm -o test
 ~~~
+
+## Compilers
+Not only Nvidia provides mutli-threading as well as GPU compiling(`nvc`); 
+
+also intel provides their ones(`icc`)
