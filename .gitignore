@@ -1,0 +1,7 @@
+# datas
+*.dat
+*.csv
+*.nii
+
+# objects
+*.o
