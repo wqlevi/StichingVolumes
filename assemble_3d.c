@@ -1,7 +1,6 @@
 /*
  *  Mainly updated version of 3D stitching
  *  Author : Qi Wang
- * 	Update : Asymmetry unsolved
  */
 
 

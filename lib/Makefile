@@ -12,8 +12,8 @@ all: $(OBJS)
 %.o: %.c 
 	$(CC) $(CFLAGS) -fpic -O -c $(SRCP)/$^ 
 
-ldmake: %.o
-	$(CC) $(LDFLAGS) -o $^
+ldmake: $(wildcard *.o)
+	$(CC) $(LDFLAGS) -o libniftiio.so $^
 
 .PHONY: clean
 	rm -rf %.o
