@@ -18,3 +18,10 @@ $ gcc -Wall -Iinclude -Llib test.c -lnifti1io -lm -o test
 Not only Nvidia provides mutli-threading as well as GPU compiling(`nvc`); 
 
 also intel provides their ones(`icc`)
+
+## Profiler
+`$CFLAGS=-O3 -pg -g`
+then make & run executable(which gives gmon.out as profile)
+`gprof ./a.out gmon.out`
+to generate output report
+

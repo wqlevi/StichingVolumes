@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=
+CFLAGS=-O3 -pg -g
 
 all: stich
 
@@ -9,4 +9,4 @@ stich: assemble_3d.c
 time:
 	time ./stich
 clean:
-	rm -f stich *.csv *.txt *.dat
+	rm -f *.o stich *.csv *.txt *.dat
