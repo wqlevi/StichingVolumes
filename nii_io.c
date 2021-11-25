@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <nifti/nifti1_io.h>
-#include <nifti/znzlib.h>
+#include <nifti1_io.h>
+#include <znzlib.h>
+#include <nifti1.h>
 #include <stdlib.h>
 typedef enum {false ,true} bool;
 

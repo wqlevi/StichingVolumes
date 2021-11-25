@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=
+CFLAGS=-Wall
 
 all: stich
 
@@ -8,5 +8,7 @@ stich: assemble_3d.c
 
 time:
 	time ./stich
+niiio: nii_io.c
+	$(CC) $(CFLAGS) -Iinclude -Llib nii_io.c -lniftiio -lm -o nii_io
 clean:
 	rm -f stich *.csv *.txt *.dat
