@@ -9,8 +9,16 @@
 				"-fdiagnostics-color=always",
 				"-g",
 				"${file}",
+				"-I",
+				"${workspaceFolder}/include",
+				"-L",
+				"${workspaceFolder}/lib",
+				"-lniftiio",
+				"-lm",
 				"-o",
 				"${fileDirname}/${fileBasenameNoExtension}"
+
+
 			],
 			"options": {
 				"cwd": "${fileDirname}"

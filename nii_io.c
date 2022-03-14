@@ -13,18 +13,19 @@ int main(int argc, char * argv[])
     file_save = argv[2]; //save file
 
     nifti_image * img = NULL;
-    nifti_1_header * hdr;
-    
-    float *data=NULL;
+    nifti_1_header * hdr = NULL;
+    float *data_tmp=NULL;
     hdr = nifti_image_read(filename,0);
-
-    data = malloc(sizeof(nifti_image *)*400*400*451);
+    printf("%d\n",hdr->sizeof_hdr);
+    /*
+    data_tmp = malloc(sizeof(nifti_image *)*400*400*451);
     img = nifti_image_read(filename,1);
-    data = img->data;
-    if(data!=NULL) printf("success\n");
-    write_to_file(file_save,hdr,data);
-    free(data);
+    data_tmp = img->data;
+    if(data_tmp!=NULL) printf("success\n");
+    write_to_file(file_save,hdr,data_tmp);
+    free(data_tmp);
     free(img);
+    */
 return 0;
 }
 
@@ -32,7 +33,7 @@ int write_to_file(char * filename,nifti_1_header * hdr,float * data)
 {
     FILE * fh = fopen(filename,"w");
     if(fh==NULL) return(EXIT_FAILURE);
-    printf("size_t is %zu\n%d elements in total",sizeof(data),(hdr->dim[0]*hdr->dim[1]*hdr->dim[2]));
+    printf("size_t is %zu\n%d elements in total\n",sizeof(data),(hdr->dim[0]*hdr->dim[1]*hdr->dim[2]));
     size_t r = fwrite(data,(size_t)(hdr->bitpix / 8),(400*400*451),fh);
     printf("wrote %zu elements\n",r);
     fclose(fh);

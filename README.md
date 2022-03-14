@@ -12,6 +12,7 @@
 ## Compile them:
 ~~~bash
 $ gcc -Wall -Iinclude -Llib test.c -lnifti1io -lm -o test
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/qiwang/git_wq/utils_ESRGAN/lib
 ~~~
 
 ## Compilers
